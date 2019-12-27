@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Speech Synthesis</title>
+  <link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- NOTE: rate, pitch, and text identifiers line up with the property on the 'utterance'. Do not change.-->
+    <div class="voiceinator">
+
+      <h1>The Voiceinator 5000</h1>
+
+      <select name="voice" id="voices">
+        <option value="">Select A Voice</option>
+      </select>
+
+      <label for="rate">Rate:</label>
+      <input name="rate" type="range" min="0" max="3" value="1" step="0.1">
+
+      <label for="pitch">Pitch:</label>
+
+      <input name="pitch" type="range" min="0" max="2" step="0.1">
+      <textarea name="text">Hello! I love JavaScript 👍</textarea>
+      <button id="stop">Stop!</button>
+      <button id="speak">Speak</button>
+
+    </div>
+
+<script>
+  //uses rate, pitch, and text identifier in the dom
+  const msg = new SpeechSynthesisUtterance();
+
+
+  let voices = [];
+  const voicesDropdown = document.querySelector('[name="voice"]');
+  const options = document.querySelectorAll('[type="range"], [name="text"]');
+  const speakButton = document.querySelector('#speak');
+  const stopButton = document.querySelector('#stop');
+
+  msg.text = document.querySelector('[name="text"').value;
+
+  console.log(msg);
+
+
+  
+  //identify the voices available, and set it to the dropdown.
+  function populateVoices() {
+    voices = this.getVoices();
+
+    //filter only by english
+
+    const voiceOptions = voices
+      // .filter(voice => voice.lang.includes('en'))
+      .map(voice => `<option value="${voice.name}">${voice.name} (${voice.lang})</option>`).join('');
+    voicesDropdown.innerHTML = voiceOptions; 
+  }
+
+
+  //this is to change the voice, and have it play
+  function setVoice() {
+    msg.voice = voices.find(voice => voice.name === this.value);
+    toggle();
+  }
+
+  function toggle(startOver = true) {
+    speechSynthesis.cancel();
+    if (startOver) {
+      speechSynthesis.speak(msg);
+    }
+  }
+
+  //rate, pitch, and options
+  function setOption() {
+    console.log(this.name, this.value);
+    msg[this.name] = this.value;
+    toggle();    
+
+  }
+
+
+
+
+  speechSynthesis.addEventListener('voiceschanged', populateVoices);
+  voicesDropdown.addEventListener('change', setVoice);
+  options.forEach(option => option.addEventListener('change', setOption)); 
+
+  speakButton.addEventListener('click', toggle);
+
+  //You cannot pass a param in a eventlistener. Workarounds. 
+  // stopButton.addEventListener('click', toggle.bind(null, false));
+  // stopButton.addEventListener('click', function() {
+  //   toggle(false);
+  // });
+  stopButton.addEventListener('click', () => toggle(false));
+
+
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
